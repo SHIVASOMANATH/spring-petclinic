@@ -1,0 +1,32 @@
+pipeline {
+    agent { label 'JDK-17' }
+    options {
+        timeout(time: 1, unit: 'HOUR')
+    }
+    triggers {
+        pollSCM(* * * * *)
+    }
+    tools {
+        jdk 'JDK_17'
+        maven 'MAVEN_3.9'
+    }
+    stages {
+        stage ('VCS') {
+            steps {
+                git url: 'https://github.com/SHIVASOMANATH/spring-petclinic.git',
+                    branch: 'develop'
+            }
+        }
+        stage ('Build and Package') {
+             steps {
+                 sh script: 'mvn package'
+            }     
+        }
+        stage ('Reporting') {
+             steps {
+                archiveArtifacts artifacts: '**/target/springpetclinic-*.jar'
+                junit testResults: '**/target/surefire-reports/TEST-*.xml'
+            }
+        }
+    }
+}
