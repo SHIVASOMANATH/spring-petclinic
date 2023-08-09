@@ -17,16 +17,51 @@ pipeline {
                     branch: 'develop'
             }
         }
-        stage ('Build and Package') {
+        stage ('Jfrog Artifactory Configuration') {
              steps {
-                 sh script: 'mvn package'
-            }     
-        }
-        stage ('Reporting') {
-             steps {
-                archiveArtifacts artifacts: '**/target/spring-petclinic-*.jar'
-                junit testResults: '**/target/surefire-reports/TEST-*.xml'
+                rtMavenDeployer (
+                    id: "SPC_DEPLOYER",
+                    serverId: "JENKINS__JFROG_SHIVA",
+                    releaseRepo: 'shiva_jenkins-libs-snapshot-local',
+                    snapshotRepo: 'shiva_jenkins-libs-snapshot-local'
+                )
+                rtMavenRun (
+                    tool: "MAVEN_3.9",
+                    pom: "pom.xml", 
+                    goals: "clean install",
+                    deployerId: "SPC_DEPLOYER"
+                    //,
+                    //buildName: "${JOB_NAME}",
+                    //buildNumber: "${BUILD_ID}"
+                )
+                rtPublishBuildInfo (
+                    serverId: "JENKINS__JFROG_SHIVA"
+                ) 
             }
         }
+        stage('SonarQube analysis') {
+            steps{
+    // performing sonarqube analysis with "withSonarQubeENV(<Name of Server configured in Jenkins>)"
+            withSonarQubeEnv('SONAR_CLOUD_SHIVA') {
+      // requires SonarQube Scanner for Maven 3.2+
+            sh 'mvn package sonar:sonar \
+               -Dsonar.token=7427c1924e2cdc701360b70bfb84463f0cadc92d\
+               -Dsonar.host.url=https://sonarcloud.io \
+               -Dsonar.organization=springpetclinic-somanath \
+               -Dsonar.projectKey=springpetclinic-somanath_somanath'
+            }
+        }
+    }           
+       // stage ('Build and Package') {
+       //      steps {
+       //         sh script: 'mvn package'
+       //     }     
+       // }
+        // stage ('Reporting') {
+        //      steps {
+        //         archiveArtifacts artifacts: '**/target/spring-petclinic-*.jar'
+        //    //     junit testResults: '**/target/surefire-reports/TEST-*.xml'
+         //   }
+       // }
     }
 } 
