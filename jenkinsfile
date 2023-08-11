@@ -27,55 +27,8 @@ pipeline {
                -Dsonar.host.url=https://sonarcloud.io \
                -Dsonar.organization=springpetclinic-somanath \
                -Dsonar.projectKey=springpetclinic-somanath_somanath'
-// 
-        // stage ('Jfrog Artifactory Configuration') {
-            //  steps {
-                // rtMavenDeployer (
-                    // id: "SPC_DEPLOYER",
-                    // serverId: "JENKINS__JFROG_SHIVA",
-                    // releaseRepo: 'somanath_spc-libs-release-local',
-                    // snapshotRepo: 'somanath_spc-libs-release-local'
-                // )
-                // rtMavenRun (
-                    // tool: "MAVEN_3.9",
-                    // pom: "pom.xml", 
-                    // goals: "clean install",
-                    // deployerId: "SPC_DEPLOYER"
-                    ,
-                    buildName: "${JOB_NAME}",
-                    buildNumber: "${BUILD_ID}"
-                // )
-                // rtPublishBuildInfo (
-                    // serverId: "JENKINS__JFROG_SHIVA"
-                // ) 
-            // }
-        // }
+                }
             }
         }
-    }           
-        // stage ('Build and Package') {
-            // steps {
-            //   sh script: 'mvn package'
-            // }     
-        // }
-        // stage ('Reporting') {
-            // steps {
-            //    archiveArtifacts artifacts: '**/target/spring-petclinic-*.jar'
-            //    junit testResults: '**/target/surefire-reports/TEST-*.xml'
-        //    }
-        // }
-        // stage ('Deploy terraform') {
-            // steps{
-                // sh "cd vmdeploy/"
-                // sh "terraform init && terraform fmt && terraform apply -auto-approve"
-            // }
-        // }
-        // stage ('Deploy Ansible'){
-            // steps{
-                // sh "terraform output -raw spc_url > hosts"
-                // sh "export ANSIBLE_HOST_KEY_CHECKING=False"
-                // sh "ansible-playbook -i hosts --key-file '/home/dell/somanath1.pem' nop.yaml"
-            // }
-        // }
-    }
-} 
+    } 
+}
