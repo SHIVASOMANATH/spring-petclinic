@@ -12,7 +12,7 @@
         ansible.builtin.get_url:
           url: ""
           dest: "/home/spring-petclinic-2.4.2.jar"
-      - name: installing unzip for nop zip file
+      - name: installing unzip for spc zip file
         ansible.builtin.apt:
           name: unzip
           update_cache: yes
@@ -28,11 +28,11 @@
             - /var/www/spc/bin
             - /var/www/spc/logs
           state: directory
-      - name: Copy spc service file to nopcommerce path
+      - name: Copy spc service file to spc path
         ansible.builtin.copy:
           src: spc.service
           dest: /etc/systemd/system/spc.service
-      - name: Start service nopCommerce if not started
+      - name: Start service spc if not started
         ansible.builtin.service:
           name: spc
           enabled: true
