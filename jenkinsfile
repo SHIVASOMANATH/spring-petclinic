@@ -52,16 +52,29 @@ pipeline {
             }
         }
     }           
-       // stage ('Build and Package') {
-       //      steps {
-       //         sh script: 'mvn package'
-       //     }     
-       // }
-        // stage ('Reporting') {
-        //      steps {
-        //         archiveArtifacts artifacts: '**/target/spring-petclinic-*.jar'
-        //    //     junit testResults: '**/target/surefire-reports/TEST-*.xml'
-         //   }
-       // }
+        stage ('Build and Package') {
+            steps {
+              sh script: 'mvn package'
+            }     
+        }
+        stage ('Reporting') {
+            steps {
+               archiveArtifacts artifacts: '**/target/spring-petclinic-*.jar'
+               junit testResults: '**/target/surefire-reports/TEST-*.xml'
+           }
+        }
+        stage ('Deploy terraform') {
+            steps{
+                sh "cd vmdeploy/"
+                sh "terraform init && terraform fmt && terraform apply -auto-approve"
+            }
+        }
+        stage ('Deploy Ansible'){
+            steps{
+                sh "terraform output -raw spc_url > hosts"
+                sh "export ANSIBLE_HOST_KEY_CHECKING=False"
+                sh "ansible-playbook -i hosts --key-file '/home/dell/somanath1.pem' nop.yaml"
+            }
+        }
     }
 } 

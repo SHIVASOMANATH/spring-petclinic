@@ -1,0 +1,39 @@
+---
+  - name: installation of spring pet clinic
+    become: yes
+    hosts: all  
+    tasks: 
+      - name: installing java
+        ansible.builtin.apt:
+          name: openjdk-11-jdk
+          state: present
+          update_cache: yes
+      - name: download spring petclinic
+        ansible.builtin.get_url:
+          url: ""
+          dest: "/home/spring-petclinic-2.4.2.jar"
+      - name: installing unzip for nop zip file
+        ansible.builtin.apt:
+          name: unzip
+          update_cache: yes
+          state: present
+      - name: extract springpetclinic
+        ansible.builtin.unarchive:
+          src: "/spring-petclinic-2.4.2.jar"
+          dest: "/home/ubuntu"
+          remote_src: yes
+      - name: Create bin folder logs folder 
+        ansible.builtin.file:
+          path:
+            - /var/www/spc/bin
+            - /var/www/spc/logs
+          state: directory
+      - name: Copy spc service file to nopcommerce path
+        ansible.builtin.copy:
+          src: spc.service
+          dest: /etc/systemd/system/spc.service
+      - name: Start service nopCommerce if not started
+        ansible.builtin.service:
+          name: spc
+          enabled: true
+          state: started     
